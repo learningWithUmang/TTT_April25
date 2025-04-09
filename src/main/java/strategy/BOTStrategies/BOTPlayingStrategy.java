@@ -1,4 +1,4 @@
-package strategy;
+package strategy.BOTStrategies;
 
 import models.Move;
 

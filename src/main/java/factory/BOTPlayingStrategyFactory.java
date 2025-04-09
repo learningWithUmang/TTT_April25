@@ -1,10 +1,10 @@
 package factory;
 
 import enums.BOTDifficultyLevel;
-import strategy.BOTPlayingStrategy;
-import strategy.EasyBOTPlayingStrategy;
-import strategy.HardBOTPlayingStrategy;
-import strategy.MediumBOTPlayingStrategy;
+import strategy.BOTStrategies.BOTPlayingStrategy;
+import strategy.BOTStrategies.EasyBOTPlayingStrategy;
+import strategy.BOTStrategies.HardBOTPlayingStrategy;
+import strategy.BOTStrategies.MediumBOTPlayingStrategy;
 
 public class BOTPlayingStrategyFactory {
     public static BOTPlayingStrategy getBOTPlayingStrategy(BOTDifficultyLevel botDifficultyLevel){
