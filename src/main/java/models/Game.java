@@ -1,4 +1,5 @@
 package models;
+import enums.CellState;
 import enums.GameState;
 import enums.PlayerType;
 import exceptions.BOTCountInvalidException;
@@ -10,9 +11,10 @@ import java.util.*;
 public class Game {
     private Board board;
     private List<Player> players;
-    private List<Move> moves;
+    private List<Move> moves; //help in unDo feature
     private Player winner;
     private int nextPlayerTurnIndex;
+    //[p1,p2,p3,p4,p5] = 0th, 1st, 2nd....4th, 0th, 1st...
     private GameState gameState;
     private List<WinningStrategy> winningStrategies;
 
@@ -32,19 +34,111 @@ public class Game {
         this.winningStrategies = winningStrategies;
     }
 
-    public Player checkWinner(){
-        //algo to check the winner along the rows, cols, diag
-        //
-        for(WinningStrategy winningStrategy: winningStrategies){
-            winningStrategy.checkWinner();
-        }
-        return null;
+    public void printBoard(){
+        board.print();
     }
 
-    public Move makeMove(){
-        //who is the next plater to play?
+    public void unDo(){
+        //
+        if(moves.size() == 0){
+            System.out.println("There're no moves on the board, undo not possible");
+            return;
+        }
+
+        Move lastMove = moves.getLast();
+        moves.remove(lastMove);
+
+        Cell cell = lastMove.getCell();
+        cell.setCellState(CellState.EMPTY);
+        cell.setPlayer(null);
+
+        //(a-b) % m = (a%m - b%m + m) % m
+
+        nextPlayerTurnIndex = (nextPlayerTurnIndex  -  1 + players.size()) % players.size();
+
+        //update the hashmaps
+
+        for(WinningStrategy winningStrategy: winningStrategies){
+            winningStrategy.handleUndo(lastMove, board.getDimension());
+        }
+        //[0,1,2]
+
+        //idx = 1
+        /*
+        1. remove the last move from the list
+        2. remove the move from the board, make the cell empty
+         */
+    }
+
+    private boolean checkWinner(Move move){
+        //algo to check the winner along the rows, cols, diag
+        for(WinningStrategy winningStrategy: winningStrategies){
+            if(winningStrategy.checkWinner(move, board.getDimension())){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean validateMove(int row, int col){
+        //basic boundary checks
+        if(row < 0 ||  col < 0 || row >= board.getDimension() || col >= board.getDimension()){
+            return false;
+        }
+
+        //do you need to extract the cell obj from the board corresponding
+        //to this row, col
+        //board = [[c1,c2,c3],
+        //          [c4,c5,c6] ,
+        //          [c7,c8,c9]]
+
+        if(board.getBoard().get(row).get(col).getCellState().equals(CellState.FILLED)){
+            return false;
+        }
+
+        return  true;
+    }
+
+    public void makeMove(){
+        //who is the next player to play?
+        Player currentPlayer = players.get(nextPlayerTurnIndex);
+        System.out.println("It's " + currentPlayer.getName() + "'s turn"); //It's Umang's turn
+
         //ask that player to make a move?
-        return null;
+        Cell dummyCell = currentPlayer.chooseCellToPlay(board);
+        int row = dummyCell.getRow();
+        int col = dummyCell.getCol();
+
+        if(!validateMove(row, col)){
+            System.out.println("It's an invalid move, can you choose again?");
+            return;
+        }
+
+        //Is the move executed? - No
+
+        //marking the cell as filled and putting the player inside the cell
+        //executing the move on the board
+        Cell cell = board.getBoard().get(row).get(col);
+        cell.setCellState(CellState.FILLED);
+        cell.setPlayer(currentPlayer);
+
+
+        Move move = new Move(currentPlayer, cell);
+        moves.add(move);
+
+        //update nextPlayerTurnIdx
+
+        nextPlayerTurnIndex = (nextPlayerTurnIndex + 1) % players.size();
+
+        //check whether this move is a winning move??
+        if(checkWinner(move)){
+            gameState = GameState.ENDED;
+            winner = currentPlayer;
+        }else if(moves.size() == board.getDimension()* board.getDimension()) { // draw, all cells are filled
+            gameState = GameState.DRAW;
+        }
+        //do we need to validate the move player wants to make before actually executing it?
+        return;
     }
 
     public static class Builder{
@@ -113,5 +207,61 @@ public class Game {
             validate();
             return new Game(dimension, players, winningStrategies);
         }
+    }
+
+    public Board getBoard() {
+        return board;
+    }
+
+    public void setBoard(Board board) {
+        this.board = board;
+    }
+
+    public List<Player> getPlayers() {
+        return players;
+    }
+
+    public void setPlayers(List<Player> players) {
+        this.players = players;
+    }
+
+    public List<Move> getMoves() {
+        return moves;
+    }
+
+    public void setMoves(List<Move> moves) {
+        this.moves = moves;
+    }
+
+    public Player getWinner() {
+        return winner;
+    }
+
+    public void setWinner(Player winner) {
+        this.winner = winner;
+    }
+
+    public int getNextPlayerTurnIndex() {
+        return nextPlayerTurnIndex;
+    }
+
+    public void setNextPlayerTurnIndex(int nextPlayerTurnIndex) {
+        this.nextPlayerTurnIndex = nextPlayerTurnIndex;
+    }
+
+    public GameState getGameState() {
+        return gameState;
+    }
+
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
+    }
+
+    public List<WinningStrategy> getWinningStrategies() {
+        return winningStrategies;
+    }
+
+    public void setWinningStrategies(List<WinningStrategy> winningStrategies) {
+        this.winningStrategies = winningStrategies;
     }
 }

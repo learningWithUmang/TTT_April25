@@ -1,7 +1,9 @@
 package strategy.BOTStrategies;
 
+import models.Board;
+import models.Cell;
 import models.Move;
 
 public interface BOTPlayingStrategy {
-    Move makeMove();
+    Cell chooseCellToPlay(Board board);
 }

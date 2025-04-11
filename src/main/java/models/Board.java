@@ -1,4 +1,6 @@
 package models;
+import enums.CellState;
+
 import java.util.*;
 
 public class Board {
@@ -15,6 +17,20 @@ public class Board {
             for(int j = 0 ; j < dimension ; j++){
                 this.board.get(i).add(new Cell(i,j));
             }
+        }
+    }
+
+    void print(){
+        //[[],[],[],[]...]
+        for(List<Cell> cells: board){
+            for(Cell cell: cells){
+                if(cell.getCellState().equals(CellState.EMPTY)){
+                    System.out.print("|   |"); //|  |
+                }else{
+                    System.out.print("| " + cell.getPlayer().getSymbol().getSymbolChar() + " |"); // | O |
+                }
+            }
+            System.out.println();
         }
     }
 

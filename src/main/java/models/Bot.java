@@ -15,10 +15,12 @@ public class Bot extends Player{
         this.botPlayingStrategy = BOTPlayingStrategyFactory.getBOTPlayingStrategy(botDifficultyLevel);
     }
 
-    public Move makeMove(){
-        //this.botPlayingStrategy.makeMove();
-        //using it's own algorithm
-        return null;
+    public Cell chooseCellToPlay(Board board){
+        //automated
+
+        //inform back the caller the row , col
+        //he will provide where to make the move? row, col?
+        return botPlayingStrategy.chooseCellToPlay(board);
     }
 
 }

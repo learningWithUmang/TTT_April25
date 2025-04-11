@@ -11,6 +11,8 @@ import java.util.List;
 
 public class GameController {
 
+    //startGame?r?c
+    //access to his own game instance
     public Game startGame(int dimension,
                           List<Player> players,
                           List<WinningStrategy> winningStrategies) throws BOTCountInvalidException, PlayerCountNotValidException {
@@ -21,13 +23,17 @@ public class GameController {
                 build();
     }
 
-    public void makeMove(){
-
+    public void makeMove(Game game){
+        game.makeMove();
     }
 
 
-    public void unDo(){
+    public void unDo(Game game){
+        game.unDo();
+    }
 
+    public void printBoard(Game game){
+        game.printBoard();
     }
 
 
